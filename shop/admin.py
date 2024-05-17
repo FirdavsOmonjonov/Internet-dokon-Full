@@ -16,7 +16,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'price', 'discount', 'weight', 'category', 'get_image')
+    list_display = ('id', 'name', 'price', 'discount', 'quantity', 'category', 'get_image')
     list_display_links = ('id', 'name')
 
     def get_image(self, product):

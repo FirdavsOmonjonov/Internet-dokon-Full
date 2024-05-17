@@ -10,7 +10,7 @@ urlpatterns = [
     path('sorting/<slug:key_name>/', views.sorting, name='sorting'),
     #-----------------------Product details--------------------------------
     path('detail/<int:id>/', views.product_detail, name='detail'),
-    path('rate/<int:product_id>/<int:rating>/', views.rate),
+    # path('rate/<int:product_id>/<int:rating>/', views.rate),
     #-----------------------Cart--------------------------------
     path('cart/', views.cart, name='cart'),
     path('to-card/<int:product_id>/<str:action>/', views.to_cart, name='to_card'),
@@ -25,4 +25,7 @@ urlpatterns = [
     path('error2/',views.error2,name='error2'),
     #--------------------My Account--------------------
     path('accaunt/', views.profile, name='accaunt'),
+    #----------Checkout and payment--------------------
+    path('payment/',views.create_checkout_sessions, name='payment'),
+    path('success/', views.success_payment, name='success'),
 ]

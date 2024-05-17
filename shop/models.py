@@ -28,7 +28,7 @@ class Product(models.Model):
     description = models.TextField(blank=True, null=True)
     price = models.FloatField()
     discount = models.FloatField(null=True, blank=True)
-    weight = models.IntegerField(default=0)
+    quantity = models.IntegerField(default=0)
     image = models.ImageField(upload_to='products/', verbose_name="Rasmi")
     slug = models.SlugField(null=True, blank=True)
     date_added = models.DateTimeField(default=timezone.now)
