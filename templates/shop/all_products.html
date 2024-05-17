@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block main %}
+<main class="main__content_wrapper">
+    <!-- Start slider section -->
+    {% include 'components/_slider.html' %}
+    <!-- End slider section -->
+
+    <!-- Start categories product section -->
+    {% include 'components/_category.html' %}
+    <!-- End categories product section -->
+
+    <!-- Start product section -->
+    <section class="product__section product__section--style3 section--padding pt-0">
+        <div class="container">
+            <div class="section__heading text-center mb-25">
+                <span class="section__heading--subtitle">Yaqinda qo'shilgan maxshulotlar</span>
+                <h2 class="section__heading--maintitle">Barcha productlar</h2>
+            </div>
+            <ul class="product__tab--one product__tab--btn d-flex justify-content-center mb-35">
+                <li class="product__tab--btn__list active" data-toggle="tab" data-target="#product_all">All</li>
+                <li class="product__tab--btn__list" data-toggle="tab" data-target="#product_fresh">Fresh</li>
+                {% for category in categories %}
+                <li class="product__tab--btn__list" data-toggle="tab" data-target="#tab-{{ category.slug }}">{{category.name}}</li>
+                {% endfor %}
+            </ul>
+            <div class="tab_content">
+                <div id="product_all" class="tab_pane active show">
+                    <div class="product__section--inner product__section--style3__inner">
+                        <div class="row row-cols-lg-4 row-cols-md-3 row-cols-2 mb--n28">
+                            {% for product in products %}
+                            <div class="col md-28">
+                                {% include 'shop/components/_product_card.html' %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div id="product_fresh" class="tab_pane">
+                    <div class="product__section--inner product__section--style3__inner">
+                        <div class="row row-cols-lg-4 row-cols-md-3 row-cols-2 mb--n28">
+                            {% for product in new_products %}
+                            <div class="col mb-28">
+                                {% include 'shop/components/_product_card.html' %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% for category in categories %}
+                <div id="tab-{{ category.slug }}" class="tab_pane">
+                    <div class="product__section--inner product__section--style3__inner">
+                        <div class="row row-cols-lg-4 row-cols-md-3 row-cols-2 mb--n28">
+                            {% for product in category.product_set.all %}
+                            <div class="col mb-28">
+                                {% include 'shop/components/_product_card.html' %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <!-- End product section -->
+   
+    <!-- Start shipping section -->
+    {% include 'shop/components/_shipping.html' %}
+    <!-- End shipping section -->
+  
+
+</main>
+{% endblock main %}
+
+
+
+        
+
