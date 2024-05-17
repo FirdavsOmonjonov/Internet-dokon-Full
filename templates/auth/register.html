@@ -30,39 +30,39 @@
                                         <img class="img-fluid" alt="" src="{% static 'dashboard/images/logo/logo.png' %}">
                                         <h2 class="m-b-0">Register</h2>
                                     </div>
-                                    <form method="post">
+                                    <form method="post" action="{% url 'register' %}">
                                         {% csrf_token %}
                                         <div class="form-group">
-                                            <label class="font-weight-semibold" for="userName">First name :</label>
-                                            <input type="text" class="form-control" id="userName" placeholder="First name " name="first_name">
+                                            <label class="font-weight-semibold" for="firstName">First name:</label>
+                                            <input type="text" class="form-control" id="firstName" placeholder="First name" name="first_name" required>
                                         </div>
                                         <div class="form-group">
-                                            <label class="font-weight-semibold" for="userName">Last name :</label>
-                                            <input type="text" class="form-control" id="userName" placeholder="Last name " name="last_name">
+                                            <label class="font-weight-semibold" for="lastName">Last name:</label>
+                                            <input type="text" class="form-control" id="lastName" placeholder="Last name" name="last_name" required>
                                         </div>
                                         <div class="form-group">
-                                            <label class="font-weight-semibold" for="userName">Email address :</label>
-                                            <input type="email" class="form-control" id="userName" placeholder="Email address" name="email">
+                                            <label class="font-weight-semibold" for="username">Username:</label>
+                                            <input type="text" class="form-control" id="username" placeholder="Username" name="username" required>
                                         </div>
                                         <div class="form-group">
-                                            <label class="font-weight-semibold" for="userName">Username:</label>
-                                            <input type="text" class="form-control" id="userName" placeholder="Username" name="username">
+                                            <label class="font-weight-semibold" for="email">Email:</label>
+                                            <input type="email" class="form-control" id="email" placeholder="Email" name="email" required>
                                         </div>
                                         <div class="form-group">
                                             <label class="font-weight-semibold" for="password">Password:</label>
-                                            <input type="password" class="form-control" id="password" placeholder="Password" name="password">
+                                            <input type="password" class="form-control" id="password" placeholder="Password" name="password" required>
                                         </div>
                                         <div class="form-group">
                                             <label class="font-weight-semibold" for="confirmPassword">Confirm Password:</label>
-                                            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" name="confirm_password">
+                                            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" name="confirm_password" required>
                                         </div>
                                         <div class="form-group">
                                             <div class="d-flex align-items-center justify-content-between p-t-15">
-                                            <div> 
-                                                <button class="btn btn-primary">register</button>
+                                                <button class="btn btn-primary" type="submit">Register</button>
                                             </div>
                                         </div>
                                     </form>
+                                    
                                 </div>
                             </div>
                         </div>

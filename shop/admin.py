@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from .models import Category, Product, Rating
+from .models import Category, Product, ShippingAddress, Customer
 
 
 @admin.register(Category)
@@ -8,7 +8,7 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'get_image')
     list_display_link = ('id', 'name')
 
-    def get_image(sels, category):
+    def get_image(self, category):
         return mark_safe(f'<img src="{category.image.url}" width="50" height="50" />')
     
     prepopulated_fields = {'slug':('name',)}
@@ -28,7 +28,13 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
 
 
-@admin.register(Rating)
-class RatingAdmin(admin.ModelAdmin):
-    list_display = ('id',  'rating')
-    list_display_links = ('id', 'rating')
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'first_name', 'last_name')
+    list_display_links = ('id', 'user')
+
+
+@admin.register(ShippingAddress)
+class ShippingAddressAdmin(admin.ModelAdmin):
+    list_display = ('id', 'city', 'address', 'district', 'zip_code', 'email', 'mobile')
+    list_display_links = ('id', 'city')

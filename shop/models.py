@@ -95,3 +95,10 @@ class ShippingAddress(models.Model):
     zip_code = models.CharField(max_length=200)
     mobile = models.CharField(max_length=13)
     email = models.EmailField(max_length=100)
+
+class CustomerMessage(models.Model):
+    """CustomerMessage model"""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    message = models.TextField()
+    add_time = models.DateTimeField(auto_now_add=True)

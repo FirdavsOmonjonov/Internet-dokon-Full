@@ -10,7 +10,7 @@ from django.shortcuts import render
 from shop import models
 import stripe
 from django.contrib.auth.models import User
-
+from . import models
 
 
 
@@ -59,33 +59,28 @@ def sorting(request: HttpRequest, key_name) -> HttpResponse:
     }
     return render(request, 'shop/shop.html', context)
 
-# def rate(request: HttpRequest, product_id: int, rating: int) -> HttpResponse:
-#     product = models.Product.objects.get(id=product_id)
-#     models.Rating.objects.filter(product=product, user=request.user).delete()
-#     product.rating_set.create(user=request.user, rating=rating)
-#     return redirect('detail', id = product.id)
 
+def filter_products_by_price(request):
+    """Sorting products view at func level"""
+    if request.method == 'POST':
+        min_price = request.POST.get('min_price')
+        max_price = request.POST.get('max_price')
+        if min_price:
+            min_price = float(min_price)
+        else:
+            min_price = 0.0
+        if max_price:
+            max_price = float(max_price)
+        else:
+            max_price = 250.0
+        products = models.Product.objects.filter(price__range=(min_price, max_price))
+    else:
+        products = models.Product.objects.all()
+    context = {
+        'products': products,
+    }
 
-# def filter_products_by_price(request):
-#     min_price = request.GET.get('min_price')
-    # max_price = request.GET.get('max_price')
-
-    # if min_price and max_price:
-    #     # Filter products where price is between min_price and max_price
-    #     products = models.Product.objects.filter(price__range=(min_price, max_price))
-    # elif min_price:
-    #     # Filter products where price is greater than or equal to min_price
-    #     products = models.Product.objects.filter(price__gte=min_price)
-    # elif max_price:
-    #     # Filter products where price is less than or equal to max_price
-    #     products = models.Product.objects.filter(price__lte=max_price)
-    # else:
-    #     # If no price range is specified, return all products
-    #     products = models.Product.objects.all()
-
-    # return render(request, 'shop/shop.html', {'products': products})
-
-
+    return render(request, 'shop/shop.html', context)
 
 
 def product_detail(request, id):
@@ -93,11 +88,12 @@ def product_detail(request, id):
     categories = models.Category.objects.all()
     product = models.Product.objects.get(id=id)
     products = models.Product.objects.filter(category=product.category)
-
+    messages = models.CustomerMessage.objects.filter(product=product)[::-1]
     context = {
         'categories': categories,
         'product': product,
         'products': products,
+        'messages': messages,
         'page_name': "Detail",
         
     }
@@ -152,6 +148,48 @@ def checkout(request):
     }
     return render(request, 'shop/checkout.html', context)
 
+
+def shipping_address(request):
+    """Shipping address page"""
+    if request.method == 'POST':
+        models.Customer.objects.create(
+            first_name=request.POST.get('first_name'),
+            last_name=request.POST.get('last_name'),
+        )
+        models.ShippingAddress.objects.create(
+            mobile=request.POST.get('mobile'),
+            zip_code=request.POST.get('zip_code'),
+            address=request.POST.get('address'),
+            district=request.POST.get('district'),
+            city=request.POST.get('city'),
+            email=request.POST.get('email')
+        )
+        return redirect('checkout')  # Assuming 'checkout' is the name of the URL pattern
+    return render(request, 'shop/checkout.html')
+
+
+def customer_message(request):
+    """Customer message page"""
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        customer_id = request.POST.get('customer_id')
+        
+        try:
+            product =  models.Product.objects.get(id=product_id)
+            customer =  models.Customer.objects.get(id=customer_id) if customer_id else None
+            
+            models.CustomerMessage.objects.create(
+                product=product,
+                customer=customer,
+                message=request.POST.get('message'),
+            )
+            return redirect('detail', id=product.id)
+        except Product.DoesNotExist:
+          
+            return redirect('shop')  
+    return render(request, 'shop/detail.html')
+
+
 def create_checkout_sessions(request):
     """Create checkout session"""
     stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -181,6 +219,7 @@ def success_payment(request):
     """Success page"""
     return render(request, 'shop/success.html')
 
+
 def log_in(request):
     """Log in to"""
     context = {
@@ -195,12 +234,10 @@ def log_in(request):
                 login(request, user)
                 return redirect('home')
             else:
-                return render(request,'auth/error.html')
+                return redirect('login')
         except:
-            return redirect('error')
-        
+            return redirect('login')
     return render(request, 'auth/login.html', context)
-
 
 
 def register(request):
@@ -218,11 +255,9 @@ def register(request):
             print(confirm_password)
             if password == confirm_password:
                 user = User.objects.create_user(username=username, password=password, first_name=first_name, last_name=last_name, email=email)
-                
                 user = authenticate(username=username, password=password)
                 login(request, user)
                 return redirect('home')
-
         except:
             return redirect('register')
     return render(request, 'auth/register.html')
@@ -234,7 +269,7 @@ def log_out(request):
     context = {
         'page_name': "Error",
     }
-    return redirect('error2')
+    return redirect('error')
 
 
 def error(request):
@@ -242,20 +277,19 @@ def error(request):
     context = {
         'page_name': "Error",
     }
-    return render(request, 'auth/error.html', context)
-
-def error2(request):
-    """Login error"""
-    context = {
-        'page_name': "Error",
-    }
     return render(request, 'auth/error2.html', context)
+
 
 def profile(request):
     """Profile page"""
+    shipping_address = models.ShippingAddress.objects.all()
+    cart_info = CartAuthenticationUser(request).get_cart_info() 
     context = {
-            'page_name': "My account",
-        }
+        'order_products': cart_info['order_products'],
+        'cart_total_price': cart_info['cart_total_price'],
+        'cart_total_quantity': cart_info['cart_total_quantity'],
+        'page_name': "My account",
+    }
     return render(request, 'auth/my_acount.html', context)
 
 
